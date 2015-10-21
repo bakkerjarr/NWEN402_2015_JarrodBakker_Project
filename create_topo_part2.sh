@@ -40,6 +40,7 @@ echo "[?] Establishing links for host machines..."
 sudo route add 10.0.0.1 dev s1
 sudo route add 10.0.0.2 dev s1
 sudo route add 10.0.0.3 dev s1
+sudo route add 10.0.0.4 dev s1
 
 # Complete
 echo "[?] Configuration complete."

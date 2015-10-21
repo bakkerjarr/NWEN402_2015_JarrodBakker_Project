@@ -38,6 +38,7 @@ sudo ifconfig lo:1 10.0.0.1/32
 
 # Step 3
 echo "[?] Creating network..."
-#sudo mn --topo single,3 --mac --switch ovsk,inband=True,protocols=OpenFlow13 --controller=remote,ip=10.0.0.1
-sudo mn --custom mininet_topology.py  --topo 2hosts --mac --switch ovsk,inband=True,protocols=OpenFlow13 --controller=remote,ip=10.0.0.1
+sudo mn --topo single,4 --mac --switch ovsk,inband=True,protocols=OpenFlow13 --controller=remote,ip=10.0.0.1
+#sudo mn --custom mininet_topology.py  --topo 2hosts --mac --switch ovsk,inband=True,protocols=OpenFlow13 --controller=remote,ip=10.0.0.1
+#sudo ./emptynet.py
 
