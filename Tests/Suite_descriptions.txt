@@ -1,0 +1,13 @@
+Description of Test Suites
+==========================
+
+Suite 1
+    Only send traffic that will be blocked by the IPS. The first packet/s
+    in each transmission should pass through, the remaining packets should
+    fail. Packets failing to pass through mean that the IPS correctly
+    identified and blocked the traffic at the switches.
+
+Suite 2
+   Only send traffic that won't be blocked by the IPS. Packets failing to
+   pass through mean that the IPS incorrectly identified and blocked the
+   traffic at the switches.
