@@ -83,32 +83,6 @@ def get_host_ipv6():
     return host_ipv6
 
 """
- Create the list of IPv4 addresses to contact.
- @param host_ip - the IPv4 address of this host.
- @param num_host - the total number of hosts within the network.
- @return - list of IPv4 addresses to contact.
-"""
-def neighbour_ipv4(host_ip, num_host):
-    neighbours = []
-    for i in range(1,num_host+1):
-        neighbours.append(NETWORK_IPV4 + str(i))
-    neighbours.remove(host_ip)
-    return neighbours
-
-"""
- Create the list of IPv6 addresses to contact.
- @param host_ip - the IPv6 address of this host.
- @param num_host - the total number of hosts within the network.
- @return - list of IPv6 addresses to contact.
-"""
-def neighbour_ipv6(host_ip, num_host):
-    neighbours = []
-    for i in range(1,num_host+1):
-        neighbours.append(NETWORK_IPV6 + str(hex(i))[2:])
-    neighbours.remove(host_ip)
-    return neighbours
- 
-"""
  Send an ICMP ping to the destination host and inform the caller if a
  response was received.
  @param ip4_dst - destination to ping.
@@ -168,20 +142,20 @@ def send_icmpv6(ip6_dst):
  @param num_hosts - the total number of hosts within the network
 """
 def test():
-    # check that host IP is in 10.0.0.0/24 subnet
-    host_ip4 = get_host_ipv4()
-    host_ip6 = get_host_ipv6()
-    if NETWORK_IPV4 not in host_ip4:
-        print("ERROR: Host IPv4 address not in 10.0.0.0/24 subnet.")
+    # check that host IP addresses are correct
+    if NETWORK_IPV4_H3 == get_host_ipv4():
+        print("ERROR: Host IPv4 address is not 10.0.0.3 subnet.")
         sys.exit(1)
-    neighbours_ipv4 = neighbour_ipv4(host_ip4, num_hosts)
-    neighbours_ipv6 = neighbour_ipv6(host_ip6, num_hosts)
+    if NETWORK_IPV6_H3 == get_host_ipv6():
+        print("ERROR: Host IPv6 address is not fe80::200:ff:fe00:3 subnet.")
+        sys.exit(1)
+
     print("Beginning test \'" + TEST_NAME + "\'.\n\tCheck " +
           FILENAME_LOG_RESULTS + " for test results once the test"
           " has finished.")
     logging.info("Beginning test \'"+TEST_NAME+"\'") # test name here
-    logging.info("\tHost IPv4 address: " + host_ip4)
-    logging.info("\tHost IPv6 address: " + host_ip6)
+    logging.info("\tHost IPv4 address: " + NETWORK_IPV4_H3)
+    logging.info("\tHost IPv6 address: " + NETWORK_IPV6_H3)
 
     #logging.info("\t") # use for general information and test passed
     #logging.warning("\t") # use when something goes wrong e.g. test failed
@@ -190,46 +164,42 @@ def test():
     test_count = 0
 
     # IPv4 ICMP
-    for n in neighbours_ipv4:
-        logging.info("\t{0} --ICMP ping--> {1}".format(host_ip4,n)) 
-        print("\t{0} --ICMP ping--> {1}".format(host_ip4,n)) 
-        if not send_icmp(n):
-            failed.append("\tFAILED: {0} --ICMP ping--> {1}".format(host_ip4,n))
-        test_count += 1
+    logging.info("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4)) 
+    print("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4)) 
+    if not send_icmp(NETWORK_IPV4_H3):
+        failed.append("\tFAILED: {0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4))
+    test_count += 1
 
     # IPv4 TCP
-    for n in neighbours_ipv4:
-        for src in PORT_NUM_SRC:
-            for dst in PORT_NUM_DST:
-                logging.info("\t{0} --TCP(src:{1},dst:{2})--> {3}"
-                             .format(host_ip4,src,dst,n)) 
-                print("\t{0} --TCP(src:{1},dst:{2})--> {3}"
-                      .format(host_ip4,src,dst,n))
-                if not send_tcp(n,src,dst):
-                    failed.append("\tFAILED: {0} --TCP(src:{1},dst:{2})--> {3}"
-                                  .format(host_ip4,src,dst,n))
-                test_count += 1
+    for src in PORT_NUM_SRC:
+        for dst in PORT_NUM_DST:
+            logging.info("\t{0} --TCP(src:{1},dst:{2})--> {3}"
+                         .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
+            print("\t{0} --TCP(src:{1},dst:{2})--> {3}"
+                  .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+            if not send_tcp(NETWORK_IPV4_H3,src,dst):
+                failed.append("\tFAILED: {0} --TCP(src:{1},dst:{2})--> {3}"
+                              .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+            test_count += 1
 
     # IPv4 UDP
-    for n in neighbours_ipv4:
-        for src in PORT_NUM_SRC:
-            for dst in PORT_NUM_DST:
-                logging.info("\t{0} --UDP(src:{1},dst:{2})--> {3}"
-                             .format(host_ip4,src,dst,n)) 
-                print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
-                      .format(host_ip4,src,dst,n))
-                if not send_udp(n,src,dst):
-                    failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})--> {3}"
-                                  .format(host_ip4,src,dst,n))
-                test_count += 1
+    for src in PORT_NUM_SRC:
+        for dst in PORT_NUM_DST:
+            logging.info("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                         .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
+            print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                  .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+            if not send_udp(NETWORK_IPV4_H3,src,dst):
+                failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})--> {3}"
+                              .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+            test_count += 1
 
     # IPv6 ICMPv6
-    for n in neighbours_ipv6:
-        logging.info("\t{0} --ICMPv6 ping--> {1}".format(host_ip6,n)) 
-        print("\t{0} --ICMPv6 ping--> {1}".format(host_ip6,n)) 
-        if not send_icmpv6(n):
-            failed.append("\tFAILED: {0} --ICMPv6 ping--> {1}".format(host_ip6,n))
-        test_count += 1
+    logging.info("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4)) 
+    print("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4)) 
+    if not send_icmpv6(NETWORK_IPV6_H3):
+        failed.append("\tFAILED: {0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4))
+    test_count += 1
 
     # See if anything failed
     if len(failed) != 0:
