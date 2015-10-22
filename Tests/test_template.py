@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #
 # Test: Description of the test's purpose here with other details.
 #       This template contains a variety of functions to perform
@@ -7,9 +9,8 @@
 #
 # Usage: python test_name.py <number of hosts in the network>
 #
-# Test success: All traffic receives some form of response (dependent 
-#               on protocol).
-# Test failure: At least one flow does not received an answer.
+# Test success: Situation for test success.
+# Test failure: Situation for test failure.
 #
 # Note:
 #   - Test output can be found in test_name.py_results.log
@@ -24,11 +25,9 @@
 
 from scapy.all import *
 from time import sleep
-import json
 import logging
 import netifaces as ni
 import os
-import requests
 import sys
 
 FILENAME_LOG_RESULTS = None
@@ -43,9 +42,9 @@ TIMEOUT = 1
 TIME_SLEEP = 1
 
 """
- Fetch and return the IPv4 address of THIS host from interface h#_eth0
- where # is the host number.
- @return - the IPv4 address of the host's h#_eth0 interface
+Fetch and return the IPv4 address of THIS host from interface h3_eth0.
+
+@return - the IPv4 address of the host's h#_eth0 interface
 """
 def get_host_ipv4():
     all_ifaces = ni.interfaces()
@@ -62,9 +61,9 @@ def get_host_ipv4():
     return host_ipv4
 
 """
- Fetch and return the IPv6 address of THIS host from interface h#_eth0
- where # is the host number.
- @return - the IPv6 address of the host's h#_eth0 interface
+Fetch and return the IPv6 address of THIS host from interface h3_eth0.
+
+@return - the IPv6 address of the host's h#_eth0 interface
 """
 def get_host_ipv6():
     all_ifaces = ni.interfaces()
@@ -83,10 +82,11 @@ def get_host_ipv6():
     return host_ipv6
 
 """
- Send an ICMP ping to the destination host and inform the caller if a
- response was received.
- @param ip4_dst - destination to ping.
- @return - True if the host received an answer, False otherwise.
+Send an ICMP ping to the destination host and inform the caller if a
+response was received.
+
+@param ip4_dst - destination to ping.
+@return - True if the host received an answer, False otherwise.
 """
 def send_icmp(ip4_dst):
     resp = sr(IP(dst=ip4_dst)/ICMP(),timeout=TIMEOUT)
@@ -95,12 +95,13 @@ def send_icmp(ip4_dst):
     return len(resp[0]) == 1
 
 """
- Send an TCP header to the destination host and inform the caller if a
- response was received.
- @param ip4_dst - destination to ping.
- @param port_src - source port.
- @param port_dst - destation port.
- @return - True if the host received an answer, False otherwise.
+Send an TCP header to the destination host and inform the caller if a
+response was received.
+
+@param ip4_dst - destination to ping.
+@param port_src - source port.
+@param port_dst - destation port.
+@return - True if the host received an answer, False otherwise.
 """
 def send_tcp(ip4_dst, port_src, port_dst):
     resp = sr(IP(dst=ip4_dst)/TCP(sport=port_src,dport=port_dst,
@@ -110,12 +111,13 @@ def send_tcp(ip4_dst, port_src, port_dst):
     return len(resp[0]) == 1
 
 """
- Send an UDP header to the destination host and inform the caller if a
- response was received.
- @param ip4_dst - destination to ping.
- @param port_src - source port.
- @param port_dst - destation port.
- @return - True if the host received an answer, False otherwise.
+Send an UDP header to the destination host and inform the caller if a
+response was received.
+
+@param ip4_dst - destination to ping.
+@param port_src - source port.
+@param port_dst - destation port.
+@return - True if the host received an answer, False otherwise.
 """
 def send_udp(ip4_dst, port_src, port_dst):
     resp = sr(IP(dst=ip4_dst)/UDP(sport=port_src,dport=port_dst),
@@ -125,10 +127,11 @@ def send_udp(ip4_dst, port_src, port_dst):
     return len(resp[0]) == 1
 
 """
- Send an ICMPv6 ping to the destination host and inform the caller if a
- response was received.
- @param ip4_dst - destination to ping.
- @return - True if the host received an answer, False otherwise.
+Send an ICMPv6 ping to the destination host and inform the caller if a
+response was received.
+
+@param ip4_dst - destination to ping.
+@return - True if the host received an answer, False otherwise.
 """
 def send_icmpv6(ip6_dst):
     resp = sr(IPv6(dst=ip6_dst)/ICMPv6EchoRequest(),timeout=TIMEOUT)
@@ -137,17 +140,18 @@ def send_icmpv6(ip6_dst):
     return len(resp[0]) == 1
 
 """
- Summary of the test here.
-
- @param num_hosts - the total number of hosts within the network
+Summary of the test here.
 """
 def test():
     # check that host IP addresses are correct
-    if NETWORK_IPV4_H3 == get_host_ipv4():
-        print("ERROR: Host IPv4 address is not 10.0.0.3 subnet.")
+    if NETWORK_IPV4_H3 not in get_host_ipv4():
+        print("ERROR: Host IPv4 address is not 10.0.0.3.")
+        logging.warning("ERROR: Host IPv4 address is not 10.0.0.3.")
         sys.exit(1)
-    if NETWORK_IPV6_H3 == get_host_ipv6():
-        print("ERROR: Host IPv6 address is not fe80::200:ff:fe00:3 subnet.")
+    if NETWORK_IPV6_H3 not in get_host_ipv6():
+        print("ERROR: Host IPv6 address is not fe80::200:ff:fe00:3.")
+        logging.warning("ERROR: Host IPv6 address is not "
+                        " fe80::200:ff:fe00:3.")
         sys.exit(1)
 
     print("Beginning test \'" + TEST_NAME + "\'.\n\tCheck " +
@@ -164,10 +168,13 @@ def test():
     test_count = 0
 
     # IPv4 ICMP
-    logging.info("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4)) 
-    print("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4)) 
-    if not send_icmp(NETWORK_IPV4_H3):
-        failed.append("\tFAILED: {0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,NETWORK_IPV4_H4))
+    logging.info("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
+                                                   NETWORK_IPV4_H4)) 
+    print("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
+                                            NETWORK_IPV4_H4)) 
+    if not send_icmp(NETWORK_IPV4_H4):
+        failed.append("\tFAILED: {0} --ICMP ping--> {1}"
+                      .format(NETWORK_IPV4_H3,NETWORK_IPV4_H4))
     test_count += 1
 
     # IPv4 TCP
@@ -177,9 +184,10 @@ def test():
                          .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
             print("\t{0} --TCP(src:{1},dst:{2})--> {3}"
                   .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
-            if not send_tcp(NETWORK_IPV4_H3,src,dst):
+            if not send_tcp(NETWORK_IPV4_H4,src,dst):
                 failed.append("\tFAILED: {0} --TCP(src:{1},dst:{2})--> {3}"
-                              .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+                              .format(NETWORK_IPV4_H3,src,dst,
+                                      NETWORK_IPV4_H4))
             test_count += 1
 
     # IPv4 UDP
@@ -189,21 +197,26 @@ def test():
                          .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
             print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
                   .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
-            if not send_udp(NETWORK_IPV4_H3,src,dst):
+            if not send_udp(NETWORK_IPV4_H4,src,dst):
                 failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})--> {3}"
-                              .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+                              .format(NETWORK_IPV4_H3,src,dst,
+                                      NETWORK_IPV4_H4))
             test_count += 1
 
     # IPv6 ICMPv6
-    logging.info("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4)) 
-    print("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4)) 
-    if not send_icmpv6(NETWORK_IPV6_H3):
-        failed.append("\tFAILED: {0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,NETWORK_IPV6_H4))
+    logging.info("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
+                                                     NETWORK_IPV6_H4)) 
+    print("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
+                                              NETWORK_IPV6_H4)) 
+    if not send_icmpv6(NETWORK_IPV6_H4):
+        failed.append("\tFAILED: {0} --ICMPv6 ping--> {1}"
+                      .format(NETWORK_IPV6_H3,NETWORK_IPV6_H4))
     test_count += 1
 
     # See if anything failed
     if len(failed) != 0:
-        logging.warning("\tFailed {0}/{1} tests.".format(len(failed),test_count))
+        logging.warning("\tFailed {0}/{1} tests.".format(len(failed),
+                                                         test_count))
         print("\tFailed {0}/{1} tests.".format(len(failed),test_count))
         for f in failed:
             logging.warning("\t{0}".format(f))
@@ -218,7 +231,7 @@ def test():
 if __name__ == "__main__":
     TEST_NAME = os.path.basename(__file__)
     FILENAME_LOG_RESULTS = TEST_NAME[:-3] + "_results.log"
-    
+    # Log file
     logging.basicConfig(filename=FILENAME_LOG_RESULTS,
                         format='%(asctime)s %(message)s',
                         level=logging.DEBUG)
