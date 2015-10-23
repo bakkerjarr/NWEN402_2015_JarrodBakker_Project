@@ -7,13 +7,13 @@
 #       particular host or send a TCP header with the SYN flag set to
 #       a particular host on a given port.
 #
-# Usage: python test_name.py <number of hosts in the network>
+# Usage: python test_name.py
 #
 # Test success: Situation for test success.
 # Test failure: Situation for test failure.
 #
 # Note:
-#   - Test output can be found in test_name.py_results.log
+#   - Test output can be found in test_name_results.log
 #
 #   - To perform a port scan of TCP destination ports, Paramiko was used.
 #     It is a SSH module for Python.
@@ -36,7 +36,8 @@ FILENAME_LOG_RESULTS = None
 HOST3_INTERFACE = "%h3-eth0"
 NETWORK_IPV6_H3 = "fe80::200:ff:fe00:3"
 NETWORK_IPV6_H4 = "fe80::200:ff:fe00:4"
-PORT_NUM_DST = [14,16,20,21,22,23,80,123,8080,9001]
+NUM_ATTEMPTS = 3
+PORT_NUM_DST = [20,21,22,23,80,123,8080]
 TEST_NAME = None
 TIMEOUT = 1
 TIME_SLEEP = 1
@@ -77,9 +78,11 @@ def send_tcp_dest(ip6_dst, port_dst):
         ssh.connect(ip6_dst+HOST3_INTERFACE, port=port_dst, timeout=TIMEOUT)
     except socket.timeout as e:
         print str(e)
+        sleep(TIME_SLEEP)
         return False
     except socket.error as e:
         print str(e)
+        sleep(TIME_SLEEP)
         return True
     except:
         # We should never get here, but just in case...
@@ -111,14 +114,18 @@ def test():
 
     # IPv6 TCP
     for dst in PORT_NUM_DST:
-        logging.info("\t{0} --TCP(src:ephemeral,dst:{1})--> {2}"
-                     .format(NETWORK_IPV6_H3,dst,NETWORK_IPV6_H4)) 
-        print("\t{0} --TCP(src:ephemeral,dst:{1})--> {2}"
-              .format(NETWORK_IPV6_H3,dst,NETWORK_IPV6_H4)) 
-        if not send_tcp_dest(NETWORK_IPV6_H4, dst):
-            failed.append("\tFAILED: {0} --TCP(src:ephermeral,dst;{1})-->"
-                          " {2}".format(NETWORK_IPV6_H3,dst,
-                                        NETWORK_IPV6_H4))
+        num_allowed = 0
+        for i in range(NUM_ATTEMPTS):
+            logging.info("\t{0} --TCP(src:ephemeral,dst:{1})--> {2}"
+                         .format(NETWORK_IPV6_H3,dst,NETWORK_IPV6_H4)) 
+            print("\t{0} --TCP(src:ephemeral,dst:{1})--> {2}"
+                  .format(NETWORK_IPV6_H3,dst,NETWORK_IPV6_H4)) 
+            if send_tcp_dest(NETWORK_IPV6_H4, dst):
+                num_allowed += 1
+        if num_allowed == NUM_ATTEMPTS:
+            failed.append("\tFAILED: {0} --TCP(src:ephermeral,dst:"
+                          "{1})--> {2}".format(NETWORK_IPV6_H3,dst,
+                                               NETWORK_IPV6_H4))
         test_count += 1
 
     # See if anything failed

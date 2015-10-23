@@ -7,13 +7,13 @@
 #       particular host or send a TCP header with the SYN flag set to
 #       a particular host on a given port.
 #
-# Usage: python test_name.py <number of hosts in the network>
+# Usage: python test_name.py
 #
 # Test success: Situation for test success.
 # Test failure: Situation for test failure.
 #
 # Note:
-#   - Test output can be found in test_name.py_results.log
+#   - Test output can be found in test_name_results.log
 #
 #   - Scapy is used for packet manipulation.
 #
@@ -35,8 +35,9 @@ NETWORK_IPV4_H3 = "10.0.0.3"
 NETWORK_IPV6_H3 = "fe80::200:ff:fe00:3"
 NETWORK_IPV4_H4 = "10.0.0.4"
 NETWORK_IPV6_H4 = "fe80::200:ff:fe00:4"
-PORT_NUM_DST = [14,16,20,21,22,23,80,123,8080,9001]
-PORT_NUM_SRC = [4001,4002,4003,4004,4005,5011,5012,5013,5014]
+NUM_ATTEMPTS = 3
+PORT_NUM_DST = [20,21,22,23,80,123,8080]
+PORT_NUM_SRC = [4001,4002,5013,5014]
 TEST_NAME = None
 TIMEOUT = 1
 TIME_SLEEP = 1
@@ -168,11 +169,15 @@ def test():
     test_count = 0
 
     # IPv4 ICMP
-    logging.info("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
-                                                   NETWORK_IPV4_H4)) 
-    print("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
-                                            NETWORK_IPV4_H4)) 
-    if not send_icmp(NETWORK_IPV4_H4):
+    num_allowed = 0
+    for i in range(NUM_ATTEMPTS):
+        logging.info("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
+                                                       NETWORK_IPV4_H4))
+        print("\t{0} --ICMP ping--> {1}".format(NETWORK_IPV4_H3,
+                                                NETWORK_IPV4_H4)) 
+        if send_icmp(NETWORK_IPV4_H4):
+            num_allowed += 1
+    if num_allowed == NUM_ATTEMPTS:
         failed.append("\tFAILED: {0} --ICMP ping--> {1}"
                       .format(NETWORK_IPV4_H3,NETWORK_IPV4_H4))
     test_count += 1
@@ -180,35 +185,49 @@ def test():
     # IPv4 TCP
     for src in PORT_NUM_SRC:
         for dst in PORT_NUM_DST:
-            logging.info("\t{0} --TCP(src:{1},dst:{2})--> {3}"
-                         .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
-            print("\t{0} --TCP(src:{1},dst:{2})--> {3}"
-                  .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
-            if not send_tcp(NETWORK_IPV4_H4,src,dst):
-                failed.append("\tFAILED: {0} --TCP(src:{1},dst:{2})--> {3}"
-                              .format(NETWORK_IPV4_H3,src,dst,
-                                      NETWORK_IPV4_H4))
+            num_allowed = 0
+            for i in range(NUM_ATTEMPTS):
+                logging.info("\t{0} --TCP(src:{1},dst:{2})--> {3}"
+                             .format(NETWORK_IPV4_H3,src,dst,
+                                     NETWORK_IPV4_H4)) 
+                print("\t{0} --TCP(src:{1},dst:{2})--> {3}"
+                      .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+                if send_tcp(NETWORK_IPV4_H4,src,dst):
+                    num_allowed += 1            
+            if num_allowed == NUM_ATTEMPTS:
+                failed.append("\tFAILED: {0} --TCP(src:{1},dst:{2})"
+                              "--> {3}".format(NETWORK_IPV4_H3,src,
+                                               dst,NETWORK_IPV4_H4))
             test_count += 1
 
     # IPv4 UDP
     for src in PORT_NUM_SRC:
         for dst in PORT_NUM_DST:
-            logging.info("\t{0} --UDP(src:{1},dst:{2})--> {3}"
-                         .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4)) 
-            print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
-                  .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
-            if not send_udp(NETWORK_IPV4_H4,src,dst):
-                failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})--> {3}"
-                              .format(NETWORK_IPV4_H3,src,dst,
-                                      NETWORK_IPV4_H4))
+            num_allowed = 0
+            for i in range(NUM_ATTEMPTS):
+                logging.info("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                             .format(NETWORK_IPV4_H3,src,dst,
+                                     NETWORK_IPV4_H4)) 
+                print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                      .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+                if send_udp(NETWORK_IPV4_H4,src,dst):
+                    num_allowed += 1
+            if num_allowed == NUM_ATTEMPTS:
+                failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})"
+                              "--> {3}".format(NETWORK_IPV4_H3,src,
+                                               dst,NETWORK_IPV4_H4))
             test_count += 1
 
     # IPv6 ICMPv6
-    logging.info("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
-                                                     NETWORK_IPV6_H4)) 
-    print("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
-                                              NETWORK_IPV6_H4)) 
-    if not send_icmpv6(NETWORK_IPV6_H4):
+    num_allowed = 0
+    for i in range(NUM_ATTEMPTS):
+        logging.info("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
+                                                         NETWORK_IPV6_H4)) 
+        print("\t{0} --ICMPv6 ping--> {1}".format(NETWORK_IPV6_H3,
+                                                  NETWORK_IPV6_H4)) 
+        if send_icmpv6(NETWORK_IPV6_H4):
+            num_allowed += 1
+    if num_allowed == NUM_ATTEMPTS:
         failed.append("\tFAILED: {0} --ICMPv6 ping--> {1}"
                       .format(NETWORK_IPV6_H3,NETWORK_IPV6_H4))
     test_count += 1
