@@ -104,7 +104,7 @@ def test():
         dst = generate_port_num()
         num_allowed = 0
         for i in range(NUM_ATTEMPTS):
-            logging.info("\t{0} --TCP(src:{1},dst (random)):{2})--> {3}"
+            logging.info("\t{0} --TCP(src:{1},dst (random):{2})--> {3}"
                          .format(NETWORK_IPV4_H3,src,dst,
                                  NETWORK_IPV4_H4)) 
             print("\t{0} --TCP(src:{1},dst (random):{2})--> {3}"

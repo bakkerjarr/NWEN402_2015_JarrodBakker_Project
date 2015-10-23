@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
 #
-# Test: Send IPv4 TCP flows where the destination port is configured.
+# Test: Send IPv4 UDP flows where the source and destination ports
+#       are configured.
 #
-# Usage: python block_ipv4_tcp_dst.py
+# Usage: python block_ipv4_udp_src-dst.py
 #
-# Test success: IPv4 TCP flows should timeout after the first one has
+# Test success: IPv4 UDP flows should timeout after the first one has
 #               been sent.
-# Test failure: No IPv4 TCP flows timeout.
+# Test failure: No IPv4 UDP flows timeout.
 #
 # Note:
-#   - Test output can be found in block_ipv4_tcp_dst_results.log
+#   - Test output can be found in block_ipv4_udp_src-dst_results.log
 #
 #   - Scapy is used for packet manipulation.
 #
@@ -25,7 +26,6 @@ from time import sleep
 import logging
 import netifaces as ni
 import os
-import random
 import sys
 
 FILENAME_LOG_RESULTS = None
@@ -33,17 +33,10 @@ NETWORK_IPV4_H3 = "10.0.0.3"
 NETWORK_IPV4_H4 = "10.0.0.4"
 NUM_ATTEMPTS = 3
 PORT_NUM_DST = [20,21,22,23,80,123,8080]
+PORT_NUM_SRC = [4001,4002,5013,5014]
 TEST_NAME = None
 TIMEOUT = 1
 TIME_SLEEP = 1
-
-"""
-Generate a random port number between 32768 and 61000.
-
-@return - a port number.
-"""
-def generate_port_num():
-    return random.randint(32768, 61000)
 
 """
 Fetch and return the IPv4 address of THIS host from interface h3_eth0.
@@ -65,7 +58,7 @@ def get_host_ipv4():
     return host_ipv4
 
 """
-Send an TCP header to the destination host and inform the caller if a
+Send an UDP header to the destination host and inform the caller if a
 response was received.
 
 @param ip4_dst - destination to ping.
@@ -73,9 +66,9 @@ response was received.
 @param port_dst - destation port.
 @return - True if the host received an answer, False otherwise.
 """
-def send_tcp(ip4_dst, port_src, port_dst):
-    resp = sr(IP(dst=ip4_dst)/TCP(sport=port_src,dport=port_dst,
-              flags="S"),timeout=TIMEOUT)
+def send_udp(ip4_dst, port_src, port_dst):
+    resp = sr(IP(dst=ip4_dst)/UDP(sport=port_src,dport=port_dst),
+              timeout=TIMEOUT)
     # Sleep for a bit to give the IPS time to install rules
     sleep(TIME_SLEEP)
     return len(resp[0]) == 1
@@ -100,22 +93,22 @@ def test():
     test_count = 0
 
     # IPv4 TCP
-    for dst in PORT_NUM_DST:
-        src = generate_port_num()
-        num_allowed = 0
-        for i in range(NUM_ATTEMPTS):
-            logging.info("\t{0} --TCP(src (random):{1},dst:{2})--> {3}"
-                         .format(NETWORK_IPV4_H3,src,dst,
-                                 NETWORK_IPV4_H4)) 
-            print("\t{0} --TCP(src (random):{1},dst:{2})--> {3}"
-                  .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
-            if send_tcp(NETWORK_IPV4_H4,src,dst):
-                num_allowed += 1            
-        if num_allowed == NUM_ATTEMPTS:
-            failed.append("\tFAILED: {0} --TCP(src (random):{1},dst:{2})"
-                          "--> {3}".format(NETWORK_IPV4_H3,src,
-                                           dst,NETWORK_IPV4_H4))
-        test_count += 1
+    for src in PORT_NUM_SRC:
+        for dst in PORT_NUM_DST:
+            num_allowed = 0
+            for i in range(NUM_ATTEMPTS):
+                logging.info("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                             .format(NETWORK_IPV4_H3,src,dst,
+                                     NETWORK_IPV4_H4)) 
+                print("\t{0} --UDP(src:{1},dst:{2})--> {3}"
+                      .format(NETWORK_IPV4_H3,src,dst,NETWORK_IPV4_H4))
+                if send_udp(NETWORK_IPV4_H4,src,dst):
+                    num_allowed += 1            
+            if num_allowed == NUM_ATTEMPTS:
+                failed.append("\tFAILED: {0} --UDP(src:{1},dst:{2})"
+                              "--> {3}".format(NETWORK_IPV4_H3,src,
+                                               dst,NETWORK_IPV4_H4))
+            test_count += 1
 
     # See if anything failed
     if len(failed) != 0:
