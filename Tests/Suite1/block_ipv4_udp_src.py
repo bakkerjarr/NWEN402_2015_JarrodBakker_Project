@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 #
-# Test: Send IPv4 UDP flows where the source port is configured.
+# Test: Send IPv4 UDP flows where the source port is configured that
+#       should be blocked by the IPS.
 #
 # Usage: python block_ipv4_udp_src.py
 #

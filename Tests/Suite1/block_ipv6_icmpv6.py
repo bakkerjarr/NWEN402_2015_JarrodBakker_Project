@@ -2,7 +2,7 @@
 
 #
 # Test: Send ICMPv6 echo requests from h3 to h4 that should be blocked
-#       by the IPS.
+#       by the IPS that should be blocked by the IPS.
 #
 # Usage: python block_ipv6_icmpv6.py
 #

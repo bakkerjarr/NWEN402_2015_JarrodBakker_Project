@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 #
-# Test: Send IPv6 TCP flows where the destination port is configured.
+# Test: Send IPv6 TCP flows where the destination port is configured that
+#       should be blocked by the IPS.
 #
 # Usage: python block_ipv6_tcp_dst.py
 #
