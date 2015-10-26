@@ -1,0 +1,17 @@
+[**] [1:1000080:0] IPv6 TCP: fe80::200:ff:fe00:3(*) -> fe80::200:ff:fe00:4(20) [**]
+[Priority: 0] 
+10/26-22:06:32.416172 fe80::200:ff:fe00:3:41519 -> fe80::200:ff:fe00:4:20
+TCP TTL:64 TOS:0x0 ID:0 IpLen:40 DgmLen:80
+******S* Seq: 0xDA025A6D  Ack: 0x0  Win: 0x7080  TcpLen: 40
+TCP Options (5) => MSS: 1440 SackOK TS: 11071641 0 NOP WS: 9 
+
+[**] [1:1000079:0] IPv6 ICMPv6: fe80::200:ff:fe00:3 -> fe80::200:ff:fe00:4 [**]
+[Priority: 0] 
+10/26-22:06:37.416843 fe80::200:ff:fe00:3 -> fe80::200:ff:fe00:4
+IPV6-ICMP TTL:255 TOS:0x0 ID:0 IpLen:40 DgmLen:72
+
+[**] [1:1000079:0] IPv6 ICMPv6: fe80::200:ff:fe00:3 -> fe80::200:ff:fe00:4 [**]
+[Priority: 0] 
+10/26-22:06:37.416898 fe80::200:ff:fe00:3 -> fe80::200:ff:fe00:4
+IPV6-ICMP TTL:255 TOS:0x0 ID:0 IpLen:40 DgmLen:64
+
