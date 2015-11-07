@@ -77,6 +77,7 @@ from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.ofproto import ofproto_v1_3
 from ryu.ofproto import ofproto_v1_3_parser as ofp13_parser
+from ryu.lib import snortlib
 
 # Packets
 from ryu.lib.packet import ethernet
@@ -118,10 +119,10 @@ class ACLSwitch(app_manager.RyuApp):
 
     TIME_PAUSE = 1 # In seconds
 
-    _CONTEXTS = {"wsgi":WSGIApplication}
-
     # NWEN402 addition BEGIN
-    H2_SWITCH_PORT = 2
+    _CONTEXTS = {"snortlib":snortlib.SnortLib, "wsgi":WSGIApplication}
+
+    H2_SWITCH_PORT = 2 # h2 runs Snort
     # NWEN402 addition END
 
     def __init__(self, *args, **kwargs):
@@ -151,6 +152,12 @@ class ACLSwitch(app_manager.RyuApp):
         # Create an object for the REST interface
         wsgi = kwargs['wsgi']
         wsgi.register(acl_switch_rest.ACLSwitchREST, {acl_switch_instance_name : self})
+
+        # Intialise the Snort listener
+        self.snort = kwargs["snortlib"]
+        socket_config = {"unixsock": False}
+        self.snort.set_config(socket_config)
+        self.snort.start_socket_server()
 
     """
     Read in ACL rules from file filename. Note that the values passed
@@ -816,6 +823,19 @@ class ACLSwitch(app_manager.RyuApp):
                                     instructions=inst, table_id=table_id)
         datapath.send_msg(mod)
 
+    # NWEN402 addition BEGIN
+    # Snort Event handlers
+
+    """
+    Event handler for Snort events.
+    """
+    @set_ev_cls(snortlib.EventAlert, MAIN_DISPATCHER)
+    def _dump_alert(self, ev):
+        msg = ev.msg
+        print('[SNORT ALERT}] %s' % ''.join(msg.alertmsg))
+
+    # NWEN402 addition END
+
     # Methods handling OpenFlow events
     
     """
@@ -848,9 +868,6 @@ class ACLSwitch(app_manager.RyuApp):
         # Switch port to send traffic that gets sent to the controller
         # to h2 to be processed by Snort.
 
-        # Original 2 lines
-        # actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
-        #                                  ofproto.OFPCML_NO_BUFFER)]
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
                                           ofproto.OFPCML_NO_BUFFER),
                    parser.OFPActionOutput(self.H2_SWITCH_PORT)]
@@ -919,7 +936,6 @@ class ACLSwitch(app_manager.RyuApp):
         # Switch port to send all traffic that isn't currently being
         # blocked to h2 to be processed by Snort.
 
-        # actions = [parser.OFPActionOutput(out_port)] # original line
         actions = [parser.OFPActionOutput(out_port),
                    parser.OFPActionOutput(self.H2_SWITCH_PORT)]
 
