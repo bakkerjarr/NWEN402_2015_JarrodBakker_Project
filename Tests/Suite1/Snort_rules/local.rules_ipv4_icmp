@@ -1,0 +1,2 @@
+# Detect ICMP pings between 10.0.0.3 and 10.0.0.4
+alert icmp 10.0.0.3 any -> 10.0.0.4 any (msg:"IPv4 ICMP: 10.0.0.3 -> 10.0.0.4";sid:1000000;)

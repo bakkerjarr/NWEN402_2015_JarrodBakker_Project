@@ -1,0 +1,2 @@
+# Detect ICMPv6 pings between 10.0.0.3 and 10.0.0.4
+alert icmp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 any (msg:"IPv6 ICMPv6: fe80::200:ff:fe00:3 -> fe80::200:ff:fe00:4";sid:1000079;)

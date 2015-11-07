@@ -1,0 +1,8 @@
+# Detect IPv6 TCP traffic between 10.0.0.3 and 10.0.0.4 with specific destination ports
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 20 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (20)"; sid:1000080;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 21 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (21)"; sid:1000081;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 22 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (22)"; sid:1000082;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 23 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (23)"; sid:1000083;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 80 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (80)"; sid:1000084;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 123 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (123)"; sid:1000085;)
+alert tcp fe80::200:ff:fe00:3 any -> fe80::200:ff:fe00:4 8080 (msg:"IPv6 TCP: fe80::200:ff:fe00:3 (*) -> fe80::200:ff:fe00:4 (8080)"; sid:1000086;)

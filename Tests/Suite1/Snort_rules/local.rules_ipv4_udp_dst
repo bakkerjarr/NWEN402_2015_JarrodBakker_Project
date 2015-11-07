@@ -1,0 +1,9 @@
+# Detect IPv4 UDP traffic between 10.0.0.3 and 10.0.0.4
+# Specific UDP destination ports
+alert udp 10.0.0.3 any -> 10.0.0.4 20 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (20)"; sid:1000040;)
+alert udp 10.0.0.3 any -> 10.0.0.4 21 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (21)"; sid:1000041;)
+alert udp 10.0.0.3 any -> 10.0.0.4 22 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (22)"; sid:1000042;)
+alert udp 10.0.0.3 any -> 10.0.0.4 23 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (23)"; sid:1000043;)
+alert udp 10.0.0.3 any -> 10.0.0.4 80 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (80)"; sid:1000044;)
+alert udp 10.0.0.3 any -> 10.0.0.4 123 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (123)"; sid:1000045;)
+alert udp 10.0.0.3 any -> 10.0.0.4 8080 (msg:"IPv4 UDP: 10.0.0.3 (*) -> 10.0.0.4 (8080)"; sid:1000046;)

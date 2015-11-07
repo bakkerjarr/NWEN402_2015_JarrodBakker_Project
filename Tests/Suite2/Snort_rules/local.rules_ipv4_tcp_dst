@@ -1,0 +1,9 @@
+# Detect IPv4 TCP traffic between 10.0.0.3 and 10.0.0.4
+# Specific TCP destination ports
+alert tcp 10.0.0.3 any -> 10.0.0.4 20 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (10)"; sid:1000001;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 21 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (11)"; sid:1000002;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 22 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (12)"; sid:1000003;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 23 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (13)"; sid:1000004;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 80 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (70)"; sid:1000005;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 123 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (113)"; sid:1000006;)
+alert tcp 10.0.0.3 any -> 10.0.0.4 8080 (msg:"IPv4 TCP: 10.0.0.3 (*) -> 10.0.0.4 (7080)"; sid:1000007;)
