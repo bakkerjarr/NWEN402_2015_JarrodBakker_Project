@@ -767,6 +767,45 @@ class ACLSwitch(app_manager.RyuApp):
             # until a second passes.
             hub.sleep(self.TIME_PAUSE)
 
+    # NWEN402 addition BEGIN
+    # Methods handling the parsing of Snort alerts
+    """
+    Parse message data from a Snort alert and create an ACL rule based
+    on the message contents.
+
+    @param alert_msg - the message data to parse.
+    """
+    def _parse_snort_alert(self, alert_msg):
+        # Temporarily store the data within a list where the following
+        # indices hold the following data:
+        #   - 0: Source IP address
+        #   - 1: Destination IP address
+        #   - 2: Transport layer protocol
+        #   - 3: Source Port
+        #   - 4: Destination Port
+        parsed_alert = []
+        msg_split = alert_msg.split()
+
+        # Remove trailing null characters
+        msg_split[-1] = msg_split[-1].rstrip("\0")
+
+        print("[DEBUG] split alert msg: {0}".format(msg_split))
+
+        # Determine the kind of ACL rule that needs to be created
+        if "ICMP" in msg_split[1]:
+            self.acl_rule_add(msg_split[2],msg_split[4],"*","*","*",
+                              self.POLICY_DEFAULT)
+        elif "TCP" in msg_split[1]:
+            self.acl_rule_add(msg_split[2],msg_split[5],"tcp",
+                              msg_split[3][1:-1],msg_split[6][1:-1],
+                              self.POLICY_DEFAULT)
+        else:
+            # "UDP" is the only other case to check out for
+            self.acl_rule_add(msg_split[2],msg_split[5],"udp",
+                              msg_split[3][1:-1],msg_split[6][1:-1],
+                              self.POLICY_DEFAULT)
+    # NWEN402 addition END
+
     # Methods handling OpenFlow flow table entries
     
     """
@@ -831,8 +870,9 @@ class ACLSwitch(app_manager.RyuApp):
     """
     @set_ev_cls(snortlib.EventAlert, MAIN_DISPATCHER)
     def _dump_alert(self, ev):
-        msg = ev.msg
-        print('[SNORT ALERT}] %s' % ''.join(msg.alertmsg))
+        alert_msg = "".join(ev.msg.alertmsg)
+        print('[SNORT ALERT] {0}'.format(alert_msg))
+        self._parse_snort_alert(alert_msg)
 
     # NWEN402 addition END
 
