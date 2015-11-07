@@ -1,0 +1,10 @@
+2015-11-08 00:25:56,259 Beginning test 'noblock_ipv6_icmpv6.py'
+2015-11-08 00:25:56,259 	Host IPv6 address: fe80::200:ff:fe00:3
+2015-11-08 00:25:56,259 	fe80::200:ff:fe00:3 --ICMPv6 ping--> fe80::200:ff:fe00:4
+2015-11-08 00:25:56,286 No route found for IPv6 destination fe80::200:ff:fe00:4 (no default route?)
+2015-11-08 00:25:57,357 	fe80::200:ff:fe00:3 --ICMPv6 ping--> fe80::200:ff:fe00:4
+2015-11-08 00:25:57,387 No route found for IPv6 destination fe80::200:ff:fe00:4 (no default route?)
+2015-11-08 00:25:58,442 	fe80::200:ff:fe00:3 --ICMPv6 ping--> fe80::200:ff:fe00:4
+2015-11-08 00:25:58,479 No route found for IPv6 destination fe80::200:ff:fe00:4 (no default route?)
+2015-11-08 00:25:59,535 	Passed 1/1 tests. 
+2015-11-08 00:25:59,538 Test 'noblock_ipv6_icmpv6.py' complete.
